@@ -1,0 +1,16 @@
+employee_id,name,department,gender,age,salary,experience,PerformanceRating,JoiningDate
+1001,Aarav Sharma,IT,Male,29,72000,5,4,2019-06-15
+1002,Priya Nair,HR,Female,31,65000,6,3,2018-04-20
+1003,Rahul Verma,Finance,Male,26,58000,3,4,2021-02-10
+1004,Sneha Iyer,Marketing,Female,35,75000,9,5,2016-08-12
+1005,Arjun Patel,Sales,Male,28,62000,4,3,2020-01-25
+1006,Divya Menon,IT,Female,30,71000,6,4,2018-09-17
+1007,Karan Singh,Operations,Male,32,67000,7,4,2017-11-03
+1008,Meera Reddy,HR,Female,27,60000,3,3,2021-05-18
+1009,Rohit Gupta,Finance,Male,34,77000,8,5,2016-03-22
+1010,Ananya Das,Marketing,Female,25,56000,2,3,2022-07-14
+1011,Vikram Rao,IT,Male,33,80000,9,5,2015-12-10
+1012,Neha Kapoor,Sales,Female,29,61000,4,4,2020-06-30
+1013,Aditya Jain,Operations,Male,31,69000,6,4,2018-01-09
+1014,Kavya Pillai,HR,Female,26,57000,2,3,2022-03-21
+1015,Manoj Kumar,Finance,Male,36,82000,10,5,2014-10-11

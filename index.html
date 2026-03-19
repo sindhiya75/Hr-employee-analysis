@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HR Analytics Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #040d24;
+      --bg-navy: #0a1628;
+      --bg-card: #0e1f42;
+      --bg-card-hover: #122454;
+      --sidebar-bg: linear-gradient(180deg, #0a1628 0%, #061240 50%, #0a0a2e 100%);
+      --blue-100: #dbeafe;
+      --blue-300: #93c5fd;
+      --blue-400: #60a5fa;
+      --blue-500: #3b82f6;
+      --blue-600: #2563eb;
+      --blue-700: #1d4ed8;
+      --blue-800: #1e3a8a;
+      --cyan-400: #22d3ee;
+      --cyan-500: #06b6d4;
+      --violet-400: #a78bfa;
+      --violet-500: #8b5cf6;
+      --emerald-400: #34d399;
+      --emerald-500: #10b981;
+      --amber-400: #fbbf24;
+      --rose-400: #fb7185;
+      --border: rgba(59,130,246,0.2);
+      --border-active: rgba(59,130,246,0.6);
+      --text-primary: #e0f2fe;
+      --text-secondary: #7ea6d4;
+      --sidebar-w: 260px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated mesh background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(37,99,235,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 50%, rgba(6,182,212,0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* === SIDEBAR === */
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+      overflow: hidden;
+    }
+
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 30%, rgba(59,130,246,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .sidebar-brand {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--blue-500), var(--cyan-500));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px rgba(59,130,246,0.4);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .brand-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: 0.5px;
+    }
+    .brand-sub {
+      font-size: 10px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .nav-section {
+      padding: 20px 12px 8px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 2px;
+      color: var(--text-secondary);
+      font-size: 13.5px;
+      font-weight: 500;
+      position: relative;
+      text-decoration: none;
+    }
+
+    .nav-item:hover {
+      background: rgba(59,130,246,0.12);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background: rgba(59,130,246,0.18);
+      color: var(--blue-400);
+    }
+
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 50%;
+      transform: translateY(-50%);
+      width: 3px; height: 20px;
+      background: var(--blue-500);
+      border-radius: 0 3px 3px 0;
+    }
+
+    .nav-item i { width: 18px; text-align: center; font-size: 14px; }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .upload-status {
+      background: rgba(59,130,246,0.1);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .upload-status.has-data {
+      border-color: rgba(52,211,153,0.4);
+      color: var(--emerald-400);
+    }
+
+    /* === MAIN === */
+    .main {
+      margin-left: var(--sidebar-w);
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      background: rgba(10,22,40,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .topbar-sub {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 1px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-topbar {
+      background: rgba(59,130,246,0.12);
+      border: 1px solid var(--border);
+      color: var(--blue-400);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-topbar:hover {
+      background: rgba(59,130,246,0.25);
+      border-color: var(--blue-500);
+    }
+
+    /* === SECTIONS === */
+    .section {
+      display: none;
+      padding: 28px;
+      animation: fadeIn 0.3s ease;
+    }
+    .section.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* === KPI CARDS === */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .kpi-card:hover {
+      border-color: var(--border-active);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(59,130,246,0.15);
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      opacity: 0.1;
+      transform: translate(20px, -20px);
+    }
+
+    .kpi-card.blue::before { background: var(--blue-500); }
+    .kpi-card.cyan::before { background: var(--cyan-500); }
+    .kpi-card.violet::before { background: var(--violet-500); }
+    .kpi-card.emerald::before { background: var(--emerald-500); }
+    .kpi-card.amber::before { background: var(--amber-400); }
+    .kpi-card.rose::before { background: var(--rose-400); }
+
+    .kpi-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .kpi-card.blue .kpi-icon { background: rgba(59,130,246,0.15); color: var(--blue-400); }
+    .kpi-card.cyan .kpi-icon { background: rgba(6,182,212,0.15); color: var(--cyan-400); }
+    .kpi-card.violet .kpi-icon { background: rgba(139,92,246,0.15); color: var(--violet-400); }
+    .kpi-card.emerald .kpi-icon { background: rgba(16,185,129,0.15); color: var(--emerald-400); }
+    .kpi-card.amber .kpi-icon { background: rgba(251,191,36,0.15); color: var(--amber-400); }
+    .kpi-card.rose .kpi-icon { background: rgba(251,113,133,0.15); color: var(--rose-400); }
+
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .kpi-card.blue .kpi-value { color: var(--blue-400); }
+    .kpi-card.cyan .kpi-value { color: var(--cyan-400); }
+    .kpi-card.violet .kpi-value { color: var(--violet-400); }
+    .kpi-card.emerald .kpi-value { color: var(--emerald-400); }
+    .kpi-card.amber .kpi-value { color: var(--amber-400); }
+    .kpi-card.rose .kpi-value { color: var(--rose-400); }
+
+    .kpi-label { font-size: 11.5px; color: var(--text-secondary); font-weight: 500; }
+
+    /* === CHART CARDS === */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .chart-card:hover {
+      border-color: var(--border-active);
+      box-shadow: 0 8px 32px rgba(59,130,246,0.12);
+    }
+
+    .chart-card.full { grid-column: 1 / -1; }
+
+    .chart-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chart-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chart-title i { color: var(--blue-400); font-size: 13px; }
+
+    .chart-body {
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .chart-body img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+
+    /* === UPLOAD SECTION === */
+    .upload-zone {
+      border: 2px dashed var(--border-active);
+      border-radius: 16px;
+      padding: 60px 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(59,130,246,0.03);
+      position: relative;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--blue-500);
+      background: rgba(59,130,246,0.08);
+    }
+
+    .upload-icon {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(6,182,212,0.2));
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px;
+      color: var(--blue-400);
+      margin: 0 auto 20px;
+    }
+
+    .upload-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .upload-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .btn-upload {
+      background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
+      color: white;
+      border: none;
+      padding: 11px 28px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(59,130,246,0.35);
+    }
+    .btn-upload:hover {
+      box-shadow: 0 4px 24px rgba(59,130,246,0.55);
+      transform: translateY(-1px);
+    }
+
+    .sample-info {
+      margin-top: 36px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .col-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.25);
+      color: var(--blue-300);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      margin: 4px;
+    }
+
+    /* === PROGRESS BAR === */
+    .progress-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(4,13,36,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .progress-overlay.show { display: flex; }
+
+    .progress-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 50px;
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .progress-spinner {
+      width: 60px; height: 60px;
+      border: 3px solid rgba(59,130,246,0.2);
+      border-top-color: var(--blue-500);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .progress-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .progress-sub { font-size: 12px; color: var(--text-secondary); }
+
+    /* === TABLE === */
+    .table-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px 8px 36px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+      flex: 1;
+      min-width: 200px;
+    }
+    .search-box:focus { border-color: var(--blue-500); }
+
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+    }
+    .search-wrapper i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    .filter-select {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 12.5px;
+    }
+
+    .data-table thead th {
+      background: rgba(30,58,138,0.5);
+      color: var(--blue-300);
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .data-table thead th:hover { background: rgba(30,58,138,0.7); color: var(--blue-400); }
+
+    .data-table tbody tr {
+      border-bottom: 1px solid rgba(30,58,138,0.3);
+      transition: background 0.15s;
+    }
+    .data-table tbody tr:hover { background: rgba(59,130,246,0.06); }
+
+    .data-table tbody td {
+      padding: 10px 14px;
+      color: var(--text-primary);
+    }
+
+    .pagination-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 16px;
+    }
+
+    .pagination-info { font-size: 12px; color: var(--text-secondary); }
+
+    .pagination-btns { display: flex; gap: 4px; }
+
+    .pg-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pg-btn:hover, .pg-btn.active {
+      background: rgba(59,130,246,0.2);
+      border-color: var(--blue-500);
+      color: var(--blue-400);
+    }
+    .pg-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* === EDA SECTION === */
+    .report-frame {
+      width: 100%;
+      height: 800px;
+      border: none;
+      border-radius: 12px;
+      background: white;
+    }
+
+    /* === STAT TABLE === */
+    .stat-table {
+      width: 100%;
+      font-size: 12.5px;
+    }
+    .stat-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(30,58,138,0.25);
+      color: var(--text-primary);
+    }
+    .stat-table td:first-child {
+      color: var(--text-secondary);
+      font-weight: 600;
+      width: 200px;
+    }
+
+    /* === TOAST === */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+
+    .toast {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      min-width: 250px;
+      animation: slideIn 0.3s ease;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .toast.success { border-left: 3px solid var(--emerald-400); }
+    .toast.error { border-left: 3px solid var(--rose-400); }
+    .toast.info { border-left: 3px solid var(--blue-400); }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .chart-grid { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .section-header {
+      margin-bottom: 22px;
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .section-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+    }
+    .empty-state i { font-size: 48px; margin-bottom: 16px; color: var(--border-active); }
+    .empty-state h3 { font-size: 16px; color: var(--text-primary); margin-bottom: 8px; }
+    .empty-state p { font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🧠</div>
+    <div class="brand-text">
+      <div class="brand-title">HR Analytics</div>
+      <div class="brand-sub">Intelligence Platform</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <a class="nav-item active" data-section="dashboard" onclick="navigate(this)">
+      <i class="fas fa-th-large"></i> Dashboard
+    </a>
+    <a class="nav-item" data-section="upload" onclick="navigate(this)">
+      <i class="fas fa-cloud-upload-alt"></i> Upload Dataset
+    </a>
+
+    <div class="nav-label" style="margin-top:16px">Analytics</div>
+    <a class="nav-item" data-section="analytics" onclick="navigate(this)">
+      <i class="fas fa-chart-bar"></i> Analytics
+    </a>
+    <a class="nav-item" data-section="eda" onclick="navigate(this)">
+      <i class="fas fa-microscope"></i> EDA Report
+    </a>
+    <a class="nav-item" data-section="employees" onclick="navigate(this)">
+      <i class="fas fa-users"></i> Employee Table
+    </a>
+
+    <div class="nav-label" style="margin-top:16px">Export</div>
+    <a class="nav-item" data-section="export" onclick="navigate(this)">
+      <i class="fas fa-download"></i> Export Report
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="upload-status" id="sidebarStatus">
+      <i class="fas fa-circle-dot" style="font-size:10px"></i> No dataset loaded
+    </div>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="main">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="topbarTitle">Dashboard Overview</div>
+      <div class="topbar-sub" id="topbarSub">Upload a dataset to get started</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn-topbar" id="exportCsvBtn" onclick="exportCSV()" style="display:none">
+        <i class="fas fa-file-csv"></i> Export CSV
+      </button>
+      <button class="btn-topbar" id="exportSummaryBtn" onclick="exportSummary()" style="display:none">
+        <i class="fas fa-file-alt"></i> Summary
+      </button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="section active" id="sec-dashboard">
+    <div id="dashWelcome">
+      <div class="empty-state">
+        <i class="fas fa-chart-pie"></i>
+        <h3>Welcome to HR Analytics Dashboard</h3>
+        <p>Upload your HR dataset to automatically generate insights, charts, and analytics.</p>
+        <button class="btn-upload" style="margin-top:20px" onclick="navigate(document.querySelector('[data-section=upload]'))">
+          <i class="fas fa-upload me-2"></i>Upload Dataset
+        </button>
+      </div>
+    </div>
+    <div id="dashContent" style="display:none">
+      <div class="section-header">
+        <div class="section-title">Dashboard Overview</div>
+        <div class="section-sub" id="dashSub">Your workforce at a glance</div>
+      </div>
+      <div class="kpi-grid" id="kpiGrid"></div>
+      <div class="chart-grid" id="dashCharts"></div>
+    </div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="section" id="sec-upload">
+    <div class="section-header">
+      <div class="section-title">Upload Dataset</div>
+      <div class="section-sub">Upload your HR CSV file to begin analysis</div>
+    </div>
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"
+         ondragover="event.preventDefault(); this.classList.add('dragover')"
+         ondragleave="this.classList.remove('dragover')"
+         ondrop="handleDrop(event)">
+      <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+      <div class="upload-title">Drop your CSV file here</div>
+      <div class="upload-sub">or click to browse from your computer</div>
+      <button class="btn-upload" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">
+        <i class="fas fa-folder-open me-2"></i>Choose File
+      </button>
+      <input type="file" id="fileInput" accept=".csv" style="display:none" onchange="handleFileSelect(event)">
+    </div>
+
+    <div class="sample-info" style="margin-top:24px">
+      <div style="font-size:13px; font-weight:700; color:var(--blue-300); margin-bottom:12px">
+        <i class="fas fa-info-circle me-2"></i>Supported Column Names
+      </div>
+      <div>
+        <span class="col-badge"><i class="fas fa-id-card"></i> Employee ID</span>
+        <span class="col-badge"><i class="fas fa-user"></i> Name</span>
+        <span class="col-badge"><i class="fas fa-sitemap"></i> Department</span>
+        <span class="col-badge"><i class="fas fa-venus-mars"></i> Gender</span>
+        <span class="col-badge"><i class="fas fa-calendar"></i> Age</span>
+        <span class="col-badge"><i class="fas fa-money-bill"></i> Salary</span>
+        <span class="col-badge"><i class="fas fa-briefcase"></i> Experience</span>
+        <span class="col-badge"><i class="fas fa-star"></i> Performance Rating</span>
+        <span class="col-badge"><i class="fas fa-calendar-plus"></i> Joining Date</span>
+      </div>
+      <div style="margin-top:14px; font-size:12px; color:var(--text-secondary)">
+        Column names are automatically detected and normalized. Variations like "emp_id", "dept", "hire_date" are supported.
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div class="section" id="sec-analytics">
+    <div class="section-header">
+      <div class="section-title">Analytics</div>
+      <div class="section-sub">Detailed workforce analysis and visualizations</div>
+    </div>
+    <div id="analyticsContent">
+      <div class="empty-state">
+        <i class="fas fa-chart-line"></i>
+        <h3>No Data Available</h3>
+        <p>Please upload a dataset first to view analytics.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDA REPORT -->
+  <div class="section" id="sec-eda">
+    <div class="section-header">
+      <div class="section-title">EDA Report</div>
+      <div class="section-sub">Automated exploratory data analysis</div>
+    </div>
+    <div id="edaContent">
+      <div class="empty-state">
+        <i class="fas fa-microscope"></i>
+        <h3>No Report Generated</h3>
+        <p>Please upload a dataset to generate the EDA report.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPLOYEE TABLE -->
+  <div class="section" id="sec-employees">
+    <div class="section-header">
+      <div class="section-title">Employee Table</div>
+      <div class="section-sub">Browse, search and filter your workforce data</div>
+    </div>
+    <div id="tableContent">
+      <div class="empty-state">
+        <i class="fas fa-table"></i>
+        <h3>No Data Available</h3>
+        <p>Please upload a dataset to view employee records.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="section" id="sec-export">
+    <div class="section-header">
+      <div class="section-title">Export Report</div>
+      <div class="section-sub">Download your data and reports</div>
+    </div>
+    <div id="exportContent">
+      <div class="empty-state">
+        <i class="fas fa-download"></i>
+        <h3>No Data to Export</h3>
+        <p>Please upload a dataset first.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Progress Overlay -->
+<div class="progress-overlay" id="progressOverlay">
+  <div class="progress-card">
+    <div class="progress-spinner"></div>
+    <div class="progress-text">Analyzing Dataset...</div>
+    <div class="progress-sub">Generating charts and insights</div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  let appState = {
+    sessionId: null,
+    analytics: null,
+    charts: null,
+    columns: [],
+    reportUrl: null,
+    csvUrl: null,
+    tableState: { page: 1, search: '', dept: '', gender: '', sortCol: '', sortDir: 'asc' }
+  };
+
+  // Navigation
+  function navigate(el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    const section = el.dataset.section;
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('sec-' + section).classList.add('active');
+    const titles = {
+      dashboard: ['Dashboard Overview', 'Your workforce at a glance'],
+      upload: ['Upload Dataset', 'Import your HR CSV file'],
+      analytics: ['Analytics', 'Charts and detailed analysis'],
+      eda: ['EDA Report', 'Automated exploratory data analysis'],
+      employees: ['Employee Table', 'Browse and filter employee records'],
+      export: ['Export Report', 'Download your data and reports']
+    };
+    document.getElementById('topbarTitle').textContent = titles[section]?.[0] || '';
+    document.getElementById('topbarSub').textContent = titles[section]?.[1] || '';
+    if (section === 'employees' && appState.sessionId) loadTable();
+  }
+
+  // File handling
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('uploadZone').classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
+  }
+
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) processFile(file);
+  }
+
+  function processFile(file) {
+    if (!file.name.endsWith('.csv')) {
+      showToast('Only CSV files are supported.', 'error');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('file', file);
+    document.getElementById('progressOverlay').classList.add('show');
+
+    fetch('/api/upload', { method: 'POST', body: formData })
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('progressOverlay').classList.remove('show');
+        if (data.error) { showToast(data.error, 'error'); return; }
+        appState.sessionId = data.session_id;
+        appState.analytics = data.analytics;
+        appState.charts = data.charts;
+        appState.columns = data.columns;
+        appState.reportUrl = data.report_url;
+        appState.csvUrl = data.csv_url;
+        renderDashboard();
+        renderAnalytics();
+        renderEDA();
+        renderExport();
+        updateSidebar(file.name);
+        showToast('Dataset uploaded and analyzed successfully!', 'success');
+        navigate(document.querySelector('[data-section="dashboard"]'));
+      })
+      .catch(e => {
+        document.getElementById('progressOverlay').classList.remove('show');
+        showToast('Upload failed: ' + e.message, 'error');
+      });
+  }
+
+  function updateSidebar(filename) {
+    const el = document.getElementById('sidebarStatus');
+    el.className = 'upload-status has-data';
+    el.innerHTML = `<i class="fas fa-check-circle" style="font-size:10px"></i> ${filename}`;
+    document.getElementById('exportCsvBtn').style.display = '';
+    document.getElementById('exportSummaryBtn').style.display = '';
+  }
+
+  // Dashboard
+  function renderDashboard() {
+    const a = appState.analytics;
+    document.getElementById('dashWelcome').style.display = 'none';
+    document.getElementById('dashContent').style.display = '';
+    document.getElementById('dashSub').textContent = `Dataset loaded — ${a.overview.total_employees.toLocaleString()} employees across ${a.departments?.count || '?'} departments`;
+
+    const kpis = [
+      { label: 'Total Employees', value: a.overview.total_employees.toLocaleString(), icon: 'fa-users', color: 'blue' },
+      { label: 'Departments', value: a.departments?.count ?? '—', icon: 'fa-sitemap', color: 'cyan' },
+      { label: 'Avg Salary', value: a.salary ? formatNum(a.salary.mean) : '—', icon: 'fa-money-bill-wave', color: 'emerald' },
+      { label: 'Avg Age', value: a.age ? a.age.mean + ' yrs' : '—', icon: 'fa-calendar-alt', color: 'violet' },
+      { label: 'Avg Experience', value: a.experience ? a.experience.mean + ' yrs' : '—', icon: 'fa-briefcase', color: 'amber' },
+      { label: 'Avg Performance', value: a.performance ? a.performance.mean : '—', icon: 'fa-star', color: 'rose' },
+    ];
+
+    document.getElementById('kpiGrid').innerHTML = kpis.map(k => `
+      <div class="kpi-card ${k.color}">
+        <div class="kpi-icon"><i class="fas ${k.icon}"></i></div>
+        <div class="kpi-value">${k.value}</div>
+        <div class="kpi-label">${k.label}</div>
+      </div>`).join('');
+
+    // Key charts on dashboard
+    const charts = appState.charts;
+    const dashChartKeys = [
+      { key: 'dept_bar', title: 'Employees per Department', icon: 'fa-chart-bar' },
+      { key: 'gender_pie', title: 'Gender Distribution', icon: 'fa-venus-mars' },
+      { key: 'salary_dept', title: 'Avg Salary by Department', icon: 'fa-money-bill-wave' },
+      { key: 'corr_heatmap', title: 'Correlation Heatmap', icon: 'fa-th', full: true },
+    ];
+
+    document.getElementById('dashCharts').innerHTML = dashChartKeys
+      .filter(c => charts[c.key])
+      .map(c => `
+      <div class="chart-card ${c.full ? 'full' : ''}">
+        <div class="chart-header">
+          <div class="chart-title"><i class="fas ${c.icon}"></i>${c.title}</div>
+        </div>
+        <div class="chart-body">
+          <img src="data:image/png;base64,${charts[c.key]}" alt="${c.title}">
+        </div>
+      </div>`).join('');
+  }
+
+  function formatNum(n) {
+    if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+    if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+    return n.toLocaleString();
+  }
+
+  // Analytics
+  function renderAnalytics() {
+    const charts = appState.charts;
+    const a = appState.analytics;
+    const allCharts = [
+      { key: 'dept_bar', title: 'Employees per Department', icon: 'fa-chart-bar' },
+      { key: 'salary_dept', title: 'Avg Salary by Department', icon: 'fa-money-bill-wave' },
+      { key: 'gender_pie', title: 'Gender Distribution', icon: 'fa-venus-mars' },
+      { key: 'gender_salary', title: 'Avg Salary by Gender', icon: 'fa-balance-scale' },
+      { key: 'age_hist', title: 'Age Distribution', icon: 'fa-calendar' },
+      { key: 'exp_dist', title: 'Experience Distribution', icon: 'fa-briefcase' },
+      { key: 'perf_dist', title: 'Performance Rating Distribution', icon: 'fa-star' },
+      { key: 'corr_heatmap', title: 'Feature Correlation Heatmap', icon: 'fa-th', full: true },
+    ];
+
+    let statsHtml = '';
+    if (a.salary) {
+      statsHtml += `
+      <div class="chart-card" style="margin-bottom:20px">
+        <div class="chart-header"><div class="chart-title"><i class="fas fa-chart-line"></i>Statistical Summary</div></div>
+        <div class="chart-body" style="padding:20px; display:block">
+          <table class="stat-table">
+            <tr><td>Mean Salary</td><td><strong>${a.salary.mean.toLocaleString()}</strong></td></tr>
+            <tr><td>Median Salary</td><td><strong>${a.salary.median.toLocaleString()}</strong></td></tr>
+            <tr><td>Min / Max Salary</td><td><strong>${a.salary.min.toLocaleString()} / ${a.salary.max.toLocaleString()}</strong></td></tr>
+            ${a.age ? `<tr><td>Avg Age</td><td><strong>${a.age.mean} years</strong></td></tr>` : ''}
+            ${a.experience ? `<tr><td>Avg Experience</td><td><strong>${a.experience.mean} years</strong></td></tr>` : ''}
+            ${a.performance ? `<tr><td>Avg Performance Rating</td><td><strong>${a.performance.mean}</strong></td></tr>` : ''}
+          </table>
+        </div>
+      </div>`;
+    }
+
+    document.getElementById('analyticsContent').innerHTML = statsHtml + `
+      <div class="chart-grid">${allCharts.filter(c => charts[c.key]).map(c => `
+        <div class="chart-card ${c.full ? 'full' : ''}">
+          <div class="chart-header"><div class="chart-title"><i class="fas ${c.icon}"></i>${c.title}</div></div>
+          <div class="chart-body"><img src="data:image/png;base64,${charts[c.key]}" alt="${c.title}"></div>
+        </div>`).join('')}
+      </div>`;
+  }
+
+  // EDA
+  function renderEDA() {
+    document.getElementById('edaContent').innerHTML = `
+      <div style="display:flex; gap:10px; margin-bottom:16px; align-items:center">
+        <div style="font-size:13px; color:var(--text-secondary)">Automated EDA report generated successfully.</div>
+        <a href="${appState.reportUrl}" download class="btn-topbar" style="text-decoration:none">
+          <i class="fas fa-download"></i> Download Report
+        </a>
+      </div>
+      <iframe class="report-frame" src="${appState.reportUrl}"></iframe>`;
+  }
+
+  // Export
+  function renderExport() {
+    const a = appState.analytics;
+    document.getElementById('exportContent').innerHTML = `
+      <div class="kpi-grid">
+        <div class="kpi-card blue" style="cursor:pointer" onclick="window.location='${appState.csvUrl}'">
+          <div class="kpi-icon"><i class="fas fa-file-csv"></i></div>
+          <div class="kpi-value" style="font-size:16px">CSV Export</div>
+          <div class="kpi-label">Download cleaned dataset</div>
+        </div>
+        <div class="kpi-card cyan" style="cursor:pointer" onclick="window.location='${appState.reportUrl}'">
+          <div class="kpi-icon"><i class="fas fa-file-code"></i></div>
+          <div class="kpi-value" style="font-size:16px">EDA Report</div>
+          <div class="kpi-label">Download HTML report</div>
+        </div>
+        <div class="kpi-card violet" style="cursor:pointer" onclick="exportSummary()">
+          <div class="kpi-icon"><i class="fas fa-file-alt"></i></div>
+          <div class="kpi-value" style="font-size:16px">Summary TXT</div>
+          <div class="kpi-label">Download text summary report</div>
+        </div>
+        <div class="kpi-card emerald" style="cursor:pointer" onclick="downloadAllCharts()">
+          <div class="kpi-icon"><i class="fas fa-images"></i></div>
+          <div class="kpi-value" style="font-size:16px">Charts</div>
+          <div class="kpi-label">Save all charts as images</div>
+        </div>
+      </div>
+
+      <div style="margin-top:24px">
+        <div class="section-title" style="font-size:15px; margin-bottom:16px">Preview Charts for Download</div>
+        <div class="chart-grid">${Object.entries(appState.charts).map(([k, b64]) => `
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title"><i class="fas fa-chart-bar"></i>${k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</div>
+              <button class="btn-topbar" style="padding:5px 10px;font-size:11px" onclick="downloadChart('${k}')">
+                <i class="fas fa-download"></i>
+              </button>
+            </div>
+            <div class="chart-body"><img id="chart-${k}" src="data:image/png;base64,${b64}" alt="${k}"></div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  function downloadChart(key) {
+    const img = document.getElementById('chart-' + key);
+    const a = document.createElement('a');
+    a.href = img.src;
+    a.download = key + '.png';
+    a.click();
+    showToast('Chart downloaded!', 'success');
+  }
+
+  function downloadAllCharts() {
+    Object.keys(appState.charts).forEach((k, i) => {
+      setTimeout(() => downloadChart(k), i * 300);
+    });
+    showToast('Downloading all charts...', 'info');
+  }
+
+  function exportCSV() {
+    if (appState.csvUrl) window.location = appState.csvUrl;
+    else showToast('No dataset loaded.', 'error');
+  }
+
+  function exportSummary() {
+    if (!appState.sessionId) { showToast('No dataset loaded.', 'error'); return; }
+    fetch('/api/export_summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: appState.sessionId })
+    }).then(r => r.blob()).then(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'hr_summary_report.txt'; a.click();
+      showToast('Summary report downloaded!', 'success');
+    });
+  }
+
+  // Table
+  let tableColumns = [];
+  let sortState = { col: '', dir: 'asc' };
+
+  function loadTable() {
+    if (!appState.sessionId) return;
+    const ts = appState.tableState;
+    fetch('/api/table', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id: appState.sessionId,
+        page: ts.page,
+        per_page: 20,
+        search: ts.search,
+        department: ts.dept,
+        gender: ts.gender,
+        sort_col: sortState.col,
+        sort_dir: sortState.dir
+      })
+    }).then(r => r.json()).then(data => {
+      if (data.error) { showToast(data.error, 'error'); return; }
+      renderTable(data);
+    });
+  }
+
+  function renderTable(data) {
+    const depts = data.departments || [];
+    const genders = data.genders || [];
+    tableColumns = data.columns;
+
+    const controls = `
+      <div class="table-controls">
+        <div class="search-wrapper">
+          <i class="fas fa-search"></i>
+          <input class="search-box" placeholder="Search employees..." 
+            value="${appState.tableState.search}"
+            oninput="appState.tableState.search=this.value; appState.tableState.page=1; debounceLoad()">
+        </div>
+        ${depts.length ? `<select class="filter-select" onchange="appState.tableState.dept=this.value; appState.tableState.page=1; loadTable()">
+          <option value="">All Departments</option>
+          ${depts.map(d => `<option ${appState.tableState.dept===d?'selected':''} value="${d}">${d}</option>`).join('')}
+        </select>` : ''}
+        ${genders.length ? `<select class="filter-select" onchange="appState.tableState.gender=this.value; appState.tableState.page=1; loadTable()">
+          <option value="">All Genders</option>
+          ${genders.map(g => `<option ${appState.tableState.gender===g?'selected':''} value="${g}">${g}</option>`).join('')}
+        </select>` : ''}
+      </div>`;
+
+    const thead = `<tr>${tableColumns.map(c => `
+      <th onclick="sortTable('${c}')">
+        ${c} ${sortState.col===c ? (sortState.dir==='asc'?'↑':'↓') : ''}
+      </th>`).join('')}</tr>`;
+
+    const tbody = data.data.map(row => `<tr>${tableColumns.map(c =>
+      `<td>${row[c] ?? ''}</td>`
+    ).join('')}</tr>`).join('');
+
+    const start = (data.page-1)*data.per_page+1;
+    const end = Math.min(data.page*data.per_page, data.total);
+    const pagination = `
+      <div class="pagination-wrapper">
+        <div class="pagination-info">Showing ${start}–${end} of ${data.total.toLocaleString()} records</div>
+        <div class="pagination-btns">
+          <button class="pg-btn" ${data.page<=1?'disabled':''} onclick="appState.tableState.page=${data.page-1}; loadTable()">‹</button>
+          ${Array.from({length: Math.min(data.pages, 7)}, (_,i) => {
+            const pg = data.pages <= 7 ? i+1 : Math.max(1, data.page-3)+i;
+            if (pg > data.pages) return '';
+            return `<button class="pg-btn ${pg===data.page?'active':''}" onclick="appState.tableState.page=${pg}; loadTable()">${pg}</button>`;
+          }).join('')}
+          <button class="pg-btn" ${data.page>=data.pages?'disabled':''} onclick="appState.tableState.page=${data.page+1}; loadTable()">›</button>
+        </div>
+      </div>`;
+
+    document.getElementById('tableContent').innerHTML = `
+      ${controls}
+      <div class="chart-card">
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>${thead}</thead>
+            <tbody>${tbody}</tbody>
+          </table>
+        </div>
+      </div>
+      ${pagination}`;
+  }
+
+  function sortTable(col) {
+    if (sortState.col === col) {
+      sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortState.col = col;
+      sortState.dir = 'asc';
+    }
+    loadTable();
+  }
+
+  let debounceTimer;
+  function debounceLoad() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(loadTable, 400);
+  }
+
+  // Toast
+  function showToast(msg, type='info') {
+    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+    const colors = { success: 'var(--emerald-400)', error: 'var(--rose-400)', info: 'var(--blue-400)' };
+    const div = document.createElement('div');
+    div.className = `toast ${type}`;
+    div.innerHTML = `<i class="fas ${icons[type]}" style="color:${colors[type]}"></i><span>${msg}</span>`;
+    document.getElementById('toastContainer').appendChild(div);
+    setTimeout(() => div.remove(), 4000);
+  }
+</script>
+</body>
+</html>

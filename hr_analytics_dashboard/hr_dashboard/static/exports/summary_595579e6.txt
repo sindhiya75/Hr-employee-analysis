@@ -1,0 +1,32 @@
+============================================================
+HR EMPLOYEE ANALYTICS SUMMARY REPORT
+Generated: 2026-03-19 10:54:36
+============================================================
+
+DATASET OVERVIEW
+  Total Employees   : 15
+  Total Columns     : 9
+  Missing Values    : 0
+  Duplicate Rows    : 0
+
+SALARY STATISTICS
+  Mean Salary       : 67,466.67
+  Median Salary     : 67,000.00
+  Min Salary        : 56,000.00
+  Max Salary        : 82,000.00
+  Std Deviation     : 8,517.77
+
+DEPARTMENT ANALYSIS
+  Total Departments : 6
+  Largest Dept      : IT (3 employees)
+
+    IT                        : 3 employees
+    HR                        : 3 employees
+    Finance                   : 3 employees
+    Marketing                 : 2 employees
+    Sales                     : 2 employees
+    Operations                : 2 employees
+
+GENDER DISTRIBUTION
+    Male            : 8
+    Female          : 7
